@@ -78,18 +78,17 @@ def map_problem():
     print(res)
 
     # Ex.10
-    # TODO: create an instance of `AStar` with the `NullHeuristic`,
     #       solve the same `map_prob` with it and print the results (as before).
     # Notice: AStar constructor receives the heuristic *type* (ex: `MyHeuristicClass`),
     #         and not an instance of the heuristic (eg: not `MyHeuristicClass()`).
-    astar = AStar(NullHeuristic,0)
-    res   = astar.solve_problem(map_prob)
+    astar0 = AStar(NullHeuristic,0)
+    res   = astar0.solve_problem(map_prob)
     print (res)
     # Ex.11
-    # TODO: create an instance of `AStar` with the `AirDistHeuristic`,
     #       solve the same `map_prob` with it and print the results (as before).
-    exit()  # TODO: remove!
-
+    astar1= AStar(AirDistHeuristic,0.5)
+    res   = astar1.solve_problem(map_prob)
+    print (res)
     # Ex.12
     # TODO:
     # 1. Complete the implementation of the function
