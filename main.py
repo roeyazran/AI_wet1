@@ -21,7 +21,7 @@ def plot_distance_and_expanded_wrt_weight_figure(
         total_distance: Union[np.ndarray, List[float]],
         total_expanded: Union[np.ndarray, List[int]]):
     """
-    Use `matplotlib` to generate a figure of the distance & #expanded-nodes
+        Use `matplotlib` to generate a figure of the distance & #expanded-nodes
      w.r.t. the weight.
     """
     assert len(weights) == len(total_distance) == len(total_expanded)
@@ -33,7 +33,7 @@ def plot_distance_and_expanded_wrt_weight_figure(
     # See documentation here:
     # https://matplotlib.org/2.0.0/api/_as_gen/matplotlib.axes.Axes.plot.html
     # You can also search google for additional examples.
-    raise NotImplemented()
+    ax1.plot(weights,total_distance,'b-')
 
     # ax1: Make the y-axis label, ticks and tick labels match the line color.
     ax1.set_ylabel('distance traveled', color='b')
@@ -46,7 +46,10 @@ def plot_distance_and_expanded_wrt_weight_figure(
     # TODO: Plot the total expanded with ax2. Use `ax2.plot(...)`.
     # TODO: ax2: Make the y-axis label, ticks and tick labels match the line color.
     # TODO: Make this curve colored red with solid line style.
-    raise NotImplemented()
+    ax2.plot(weights, total_expanded, 'r-')
+    ax2.set_ylabel('States expanded', color='r')
+    ax2.tick_params('y', colors='r')
+    ax2.set_xlabel('weight')
 
     fig.tight_layout()
     plt.show()
@@ -64,8 +67,15 @@ def run_astar_for_weights_in_range(heuristic_type: HeuristicFunctionType, proble
     #    the #expanded.
     # Call the function `plot_distance_and_expanded_by_weight_figure()`
     #  with that data.
-    raise NotImplemented()  # TODO: remove!
-
+    weights=np.linspace(0.5,1,20)
+    costs = list()
+    expanded_states= list()
+    for weight in weights:
+        astar = AStar(heuristic_type,weight)
+        res= astar.solve_problem(problem)
+        costs.append(res.final_search_node.cost)
+        expanded_states.append(res.nr_expanded_states)
+    plot_distance_and_expanded_wrt_weight_figure(weights,costs,expanded_states)
 
 def map_problem():
     print()
@@ -98,8 +108,7 @@ def map_problem():
     #    (upper in this file).
     # 3. Call here the function `run_astar_for_weights_in_range()`
     #    with `AirDistHeuristic` and `map_prob`.
-    exit()  # TODO: remove!
-
+    run_astar_for_weights_in_range(AirDistHeuristic,map_prob)
 
 # --------------------------------------------------------------------
 # ----------------------- Deliveries Problem -------------------------
