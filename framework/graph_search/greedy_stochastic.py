@@ -59,5 +59,42 @@ class GreedyStochastic(BestFirstSearch):
                 of these popped items. The other items have to be
                 pushed again into that queue.
         """
+        if self.open.is_empty():
+            return
+        bestFiveList = []
+        toreturnQ = SearchNodesPriorityQueue()
 
-        raise NotImplemented()  # TODO: remove!
+        while ( not self.open.is_empty() ):
+            popedFromOpen = self.open.pop_next_node()
+            if (len(bestFiveList) < 5):
+                bestFiveList.append(popedFromOpen)
+            else:
+                i_replace = 0
+                max = list[i_replace].cost
+                for i in range (1, len(bestFiveList)):
+                    if (bestFiveList[i].cost > max):
+                        i_replace = i
+                if (popedFromOpen.cost < max):
+                    bestFiveList[i_replace] = popedFromOpen
+
+            toreturnQ.push_node(popedFromOpen)
+        while (not toreturnQ.is_empty()):
+            self.open.push_node(toreturnQ.pop_next_node())
+
+        bestFiveArr = np.ndarray(shape=(len(bestFiveList),1), dtype=SearchNode)
+        costArr = np.ndarray(shape=(len(bestFiveList), 1), dtype=float)
+        pArr = np.ndarray(shape=(len(bestFiveList), 1), dtype=float)
+        for node in bestFiveList:
+            bestFiveArr.append(node)
+            costArr.appenf(node.cost)
+
+        t =  1
+        denominator = 0
+        for x_mechane in costArr:
+            denominator += (x_mechane ** (-1 / t))
+        for cost in costArr:
+            pArr.append((cost ** (-1 / t)) / denominator)
+        chosenNode = np.random.choice(bestFiveArr,1,True,pArr)
+        self.open.extract_node(chosenNode)
+        self.close.add_node(chosenNode)
+        return chosenNode
