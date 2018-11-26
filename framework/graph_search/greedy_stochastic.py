@@ -24,16 +24,25 @@ class GreedyStochastic(BestFirstSearch):
         """
         TODO: implement this method!
         """
+        if self.close.has_state(successor_node.state):
+            if self.close.get_node_by_state(successor_node.state).expanding_priority <= successor_node.expanding_priority:
+                return
+            else:
+                self.close.remove_node(self.close.get_node_by_state(successor_node.state));
+        if self.open.has_state(successor_node.state):
+            if successor_node.expanding_priority < self.open.get_node_by_state(successor_node.state).expanding_priority:
+                self.open.extract_node(self.open.get_node_by_state(successor_node.state))
+            else:
+                return
+        self.open.push_node(successor_node)
 
-        raise NotImplemented()  # TODO: remove!
 
     def _calc_node_expanding_priority(self, search_node: SearchNode) -> float:
         """
         TODO: implement this method!
         Remember: `GreedyStochastic` is greedy.
         """
-
-        raise NotImplemented()  # TODO: remove!
+        return self.heuristic_function.estimate(search_node);
 
     def _extract_next_search_node_to_expand(self) -> Optional[SearchNode]:
         """
