@@ -66,7 +66,7 @@ class GreedyStochastic(BestFirstSearch):
 
         while ( not self.open.is_empty() ):
             popedFromOpen = self.open.pop_next_node()
-            if (len(bestFiveList) < 5):
+            if (len(bestFiveList) < self.N):
                 bestFiveList.append(popedFromOpen)
             else:
                 i_replace = 0
@@ -88,12 +88,11 @@ class GreedyStochastic(BestFirstSearch):
             bestFiveArr.append(node)
             costArr.appenf(node.cost)
 
-        t =  1
         denominator = 0
         for x_mechane in costArr:
-            denominator += (x_mechane ** (-1 / t))
+            denominator += (x_mechane ** (-1 / self.T))
         for cost in costArr:
-            pArr.append((cost ** (-1 / t)) / denominator)
+            pArr.append((cost ** (-1 / self.T)) / denominator)
         chosenNode = np.random.choice(bestFiveArr,1,True,pArr)
         self.open.extract_node(chosenNode)
         self.close.add_node(chosenNode)

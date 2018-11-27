@@ -84,23 +84,31 @@ def map_problem():
     # Ex.8
     map_prob = MapProblem(roads, 54, 549)
     uc = UniformCost()
-    #res = uc.solve_problem(map_prob)
-    #print(res)
+    res = uc.solve_problem(map_prob)
+    print(res)
 
     # Ex.10
     #       solve the same `map_prob` with it and print the results (as before).
     # Notice: AStar constructor receives the heuristic *type* (ex: `MyHeuristicClass`),
     #         and not an instance of the heuristic (eg: not `MyHeuristicClass()`).
     astar0 = AStar(NullHeuristic,0)
-    #res   = astar0.solve_problem(map_prob)
-    #print (res)
+    res   = astar0.solve_problem(map_prob)
+    print (res)
     # Ex.11
     #       solve the same `map_prob` with it and print the results (as before).
     astar1= AStar(AirDistHeuristic,0.5)
-    #res   = astar1.solve_problem(map_prob)
-    #print (res)
+    res   = astar1.solve_problem(map_prob)
+    print (res)
     # Ex.12
-    #run_astar_for_weights_in_range(AirDistHeuristic,map_prob)
+    # TODO:
+    # 1. Complete the implementation of the function
+    #    `run_astar_for_weights_in_range()` (upper in this file).
+    # 2. Complete the implementation of the function
+    #    `plot_distance_and_expanded_by_weight_figure()`
+    #    (upper in this file).
+    # 3. Call here the function `run_astar_for_weights_in_range()`
+    #    with `AirDistHeuristic` and `map_prob`.
+    run_astar_for_weights_in_range(AirDistHeuristic,map_prob)
 
 # --------------------------------------------------------------------
 # ----------------------- Deliveries Problem -------------------------
@@ -152,6 +160,17 @@ def relaxed_deliveries_problem():
     #    (x-axis). Of course that the costs of A*, and deterministic
     #    greedy are not dependent with the iteration number, so
     #    these two should be represented by horizontal lines.
+
+    print ("HOLA")
+    gs_res_list = []
+    print ("HOLA2")
+    for i in range (0,100):
+        print ("HOLA")
+        gs = GreedyStochastic(MSTAirDistHeuristic,(0.95**i))
+        gs_res_list[i] = gs.solve_problem(big_deliveries_prob).final_search_node.cost
+        print (gs_res_list[i])
+
+
     exit()  # TODO: remove!
 
 
