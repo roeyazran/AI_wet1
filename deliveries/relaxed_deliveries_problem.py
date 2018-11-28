@@ -95,7 +95,7 @@ class RelaxedDeliveriesProblem(GraphProblem):
         """
         assert isinstance(state_to_expand, RelaxedDeliveriesState)
         # print('state_to_expand links: ', self.drop_points-state_to_expand.dropped_so_far)
-        for junction in self.drop_points-state_to_expand.dropped_so_far:
+        for junction in self.possible_stop_points - state_to_expand.dropped_so_far:
             #print('cur location:', state_to_expand.current_location.index, ' succ junction index: ', junction.index)
             distance = junction.calc_air_distance_from(state_to_expand.current_location)
             if distance <= state_to_expand.fuel:
