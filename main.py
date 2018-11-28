@@ -163,15 +163,38 @@ def relaxed_deliveries_problem():
     #    greedy are not dependent with the iteration number, so
     #    these two should be represented by horizontal lines.
 
-    print ("HOLA")
-    gs_res_list = []
-    print ("HOLA2")
-    for i in range (0,100):
-        print ("HOLA")
-        gs = GreedyStochastic(MSTAirDistHeuristic,(0.95**i))
-        gs_res_list[i] = gs.solve_problem(big_deliveries_prob).final_search_node.cost
-        print (gs_res_list[i])
+    gs_res_list = list()
+    irange = range(1,101)
+    anytimeReslist= list()
+    anytimeRes = float()
+    for i in irange:
+        gs = GreedyStochastic(MSTAirDistHeuristic)
+        res = gs.solve_problem(big_deliveries_prob).final_search_node.cost
+        if i == 1 :
+            anytimeRes = res
+        else:
+            if anytimeRes > res:
+                anytimeRes = res
 
+        anytimeReslist.append(anytimeRes)
+        gs_res_list.append(res)
+
+    astar1 = AStar(MSTAirDistHeuristic, 1)
+    astar2 = AStar(MSTAirDistHeuristic, 0.5)
+    Astar1res = [astar1.solve_problem(big_deliveries_prob).final_search_node.cost]*100
+    Astar2res = [astar2.solve_problem(big_deliveries_prob).final_search_node.cost]*100
+
+    plt.figure()
+    plt.plot(irange, gs_res_list, 'b-', label='g_s solution cost')
+    plt.plot(irange, anytimeReslist, 'r-', label='any-time g_s solution cost')
+    plt.plot(irange, Astar1res, 'g-', label='greedy solution cost')
+    plt.plot(irange, Astar2res, 'y-', label='A* solution cost')
+    plt.xlabel('iteration number')
+    plt.xlabel('solution total cost')
+    plt.title('')
+    plt.legend()
+    plt.grid()
+    plt.show()
 
     exit()  # TODO: remove!
 

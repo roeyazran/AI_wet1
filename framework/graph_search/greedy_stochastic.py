@@ -42,7 +42,7 @@ class GreedyStochastic(BestFirstSearch):
         TODO: implement this method!
         Remember: `GreedyStochastic` is greedy.
         """
-        return self.heuristic_function.estimate(search_node);
+        return self.heuristic_function.estimate(search_node.state);
 
     def _extract_next_search_node_to_expand(self) -> Optional[SearchNode]:
         """
@@ -62,38 +62,49 @@ class GreedyStochastic(BestFirstSearch):
         if self.open.is_empty():
             return
         bestFiveList = []
-        toreturnQ = SearchNodesPriorityQueue()
+        toreturnQ = []
 
-        while ( not self.open.is_empty() ):
+        while  not self.open.is_empty():
             popedFromOpen = self.open.pop_next_node()
-            if (len(bestFiveList) < self.N):
+            if len(bestFiveList) < self.N:
                 bestFiveList.append(popedFromOpen)
             else:
                 i_replace = 0
-                max = list[i_replace].cost
+                max = bestFiveList[i_replace].expanding_priority
                 for i in range (1, len(bestFiveList)):
-                    if (bestFiveList[i].cost > max):
+                    if bestFiveList[i].expanding_priority > max:
                         i_replace = i
-                if (popedFromOpen.cost < max):
+                        max = bestFiveList[i].expanding_priority
+                if popedFromOpen.expanding_priority < max:
                     bestFiveList[i_replace] = popedFromOpen
 
-            toreturnQ.push_node(popedFromOpen)
-        while (not toreturnQ.is_empty()):
-            self.open.push_node(toreturnQ.pop_next_node())
+            toreturnQ.append(popedFromOpen)
 
-        bestFiveArr = np.ndarray(shape=(len(bestFiveList),1), dtype=SearchNode)
-        costArr = np.ndarray(shape=(len(bestFiveList), 1), dtype=float)
-        pArr = np.ndarray(shape=(len(bestFiveList), 1), dtype=float)
+        for retrunNode in toreturnQ:
+            self.open.push_node(retrunNode)
+
+        bestFiveArr = np.empty(shape=0, dtype=SearchNode)
+        bestFiveArrCheck = np.empty(shape=0, dtype=SearchNode)
+        costArr = []
+        pArr = np.empty(shape=0, dtype=float)
         for node in bestFiveList:
-            bestFiveArr.append(node)
-            costArr.appenf(node.cost)
-
-        denominator = 0
-        for x_mechane in costArr:
-            denominator += (x_mechane ** (-1 / self.T))
-        for cost in costArr:
-            pArr.append((cost ** (-1 / self.T)) / denominator)
-        chosenNode = np.random.choice(bestFiveArr,1,True,pArr)
+            bestFiveArr = np.append(bestFiveArr,node)
+            costArr.append(node.expanding_priority)
+        if costArr.count(0) != 0:
+            for node in bestFiveArr:
+                if node.expanding_priority == 0:
+                    bestFiveArrCheck = np.append(bestFiveArrCheck,node)
+            pArr = None
+        else:
+            bestFiveArrCheck = bestFiveArr
+            denominator = 0
+            for x_mechane in costArr:
+                denominator += (x_mechane ** (-1 / self.T))
+            for cost in costArr:
+                pArr = np.append(pArr, ((cost ** (-1 / self.T)) / denominator))
+        chosenNode = np.random.choice(bestFiveArrCheck,None,True,pArr)
         self.open.extract_node(chosenNode)
         self.close.add_node(chosenNode)
+        self.T = self.T *0.95
+
         return chosenNode
