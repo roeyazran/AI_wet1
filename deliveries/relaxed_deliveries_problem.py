@@ -99,17 +99,20 @@ class RelaxedDeliveriesProblem(GraphProblem):
             #print('cur location:', state_to_expand.current_location.index, ' succ junction index: ', junction.index)
             distance = junction.calc_air_distance_from(state_to_expand.current_location)
             if distance <= state_to_expand.fuel:
-                succ_dropped_so_far = set()
-                succ_dropped_so_far = succ_dropped_so_far.union(state_to_expand.dropped_so_far)
-                succ_dropped_so_far.add(junction)
-                successor = RelaxedDeliveriesState(junction, succ_dropped_so_far, state_to_expand.fuel-distance)
-                yield [successor, distance]
-        for junction in self.gas_stations:
-            # print('cur location:', state_to_expand.current_location.index, ' succ junction index: ', junction.index)
-            distance = junction.calc_air_distance_from(state_to_expand.current_location)
-            if distance <= state_to_expand.fuel:
-                successor = RelaxedDeliveriesState(junction, state_to_expand.dropped_so_far, self.gas_tank_capacity)
-                yield [successor, distance]
+                if junction in self.drop_points:
+                    succ_dropped_so_far = set()
+                    succ_dropped_so_far = succ_dropped_so_far.union(state_to_expand.dropped_so_far)
+                    succ_dropped_so_far.add(junction)
+                    successor = RelaxedDeliveriesState(junction, succ_dropped_so_far, state_to_expand.fuel-distance)
+                    yield [successor, distance]
+                else:
+                    successor = RelaxedDeliveriesState(junction, state_to_expand.dropped_so_far, self.gas_tank_capacity)
+                    yield [successor, distance]
+        # for junction in self.gas_stations:
+        #     print('cur location:', state_to_expand.current_location.index, ' succ junction index: ', junction.index)
+            # distance = junction.calc_air_distance_from(state_to_expand.current_location)
+            # if distance <= state_to_expand.fuel:
+            #     successor = RelaxedDeliveriesState(junction, state_to_expand.dropped_so_far, self.gas_tank_capacity)
 
 
     def is_goal(self, state: GraphProblemState) -> bool:

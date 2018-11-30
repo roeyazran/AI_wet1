@@ -99,7 +99,7 @@ class BestFirstSearch(GraphProblemSolver):
         self.close: Optional[SearchNodesCollection] = None
         self.use_close = use_close
 
-    def solve_problem(self, problem: GraphProblem) -> SearchResult:
+    def solve_problem(self, problem: object) -> object:
         """
         Implementation of the generic Best First Search algorithm.
         """

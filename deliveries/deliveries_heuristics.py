@@ -19,8 +19,10 @@ class MaxAirDistHeuristic(HeuristicFunction):
         """
         assert isinstance(self.problem, RelaxedDeliveriesProblem)
         assert isinstance(state, RelaxedDeliveriesState)
+        if self.problem.is_goal(state):
+            return 0
         max_dist=0
-        drop_points_left= self.problem.drop_points.difference(state.dropped_so_far)
+        drop_points_left = self.problem.drop_points.difference(state.dropped_so_far)
         for destination in drop_points_left:
             if destination.calc_air_distance_from(state.current_location)> max_dist:
                 max_dist=destination.calc_air_distance_from(state.current_location)
@@ -79,9 +81,25 @@ class RelaxedDeliveriesHeuristic(HeuristicFunction):
         assert isinstance(state, StrictDeliveriesState)
         if self.problem.is_goal(state):
             return 0
-        reduced_in = DeliveriesProblemInput('relaxed_reduced', state.current_location, self.problem.drop_points-state.dropped_so_far,
-                               self.problem.gas_stations, self.problem.gas_tank_capacity, state.fuel)
+        sub_prob_drop_pnts = set()
+        sub_prob_drop_pnts = sub_prob_drop_pnts.union(self.problem.drop_points-state.dropped_so_far)-{state.current_location}
+        #sub_prob_drop_pnts -= state.dropped_so_far
+        reduced_in = DeliveriesProblemInput('relaxed_reduced',state.current_location,
+                                            sub_prob_drop_pnts.copy(),
+                                            self.problem.gas_stations, self.problem.gas_tank_capacity, state.fuel)
         relaxed_problem = RelaxedDeliveriesProblem(reduced_in)
-        Astar_Mst = AStar(MSTAirDistHeuristic)
-        res = Astar_Mst.solve_problem(relaxed_problem)
-        return res.final_search_node.cost
+        # print('solving inner problem for init junction: ', state.current_location.index, 'dropping points:')
+        # for junction in relaxed_problem.drop_points:
+        #     print(junction.index)
+        # print('dropped so far:')
+        # for junction in state.dropped_so_far:
+        #     print(junction.index)
+        # print('fuel: ', state.fuel)
+        assert relaxed_problem.initial_state is not None
+        assert relaxed_problem.initial_state.current_location == state.current_location
+        astar_Mst = AStar(MSTAirDistHeuristic)
+        res = astar_Mst.solve_problem(relaxed_problem)
+        if res.final_search_node is None:
+            return np.inf
+        else:
+            return res.final_search_node.cost

@@ -76,30 +76,29 @@ class StrictDeliveriesProblem(RelaxedDeliveriesProblem):
         #         print(item.index)
         #     print("dif",-self.drop_points)
         #     exit(1)
-        for drop_point in self.possible_stop_points.difference(state_to_expand.dropped_so_far):
+        for drop_point in self.possible_stop_points-state_to_expand.dropped_so_far:
             # assert drop_point not in state_to_expand.dropped_so_far
-            cost = self._get_from_cache(hash((state_to_expand.current_location, drop_point)))
+            cost = self._get_from_cache(hash((state_to_expand.current_location.index, drop_point.index)))
             if cost is None:
                 map_prob = MapProblem(self.roads, state_to_expand.current_location.index, drop_point.index)
                 map_res = self.inner_problem_solver.solve_problem(map_prob)
                 cost = map_res.final_search_node.cost
-                self._insert_to_cache(hash((state_to_expand.current_location, drop_point)), cost)
+                self._insert_to_cache(hash((state_to_expand.current_location.index, drop_point.index)), cost)
             assert cost is not None
             if cost < state_to_expand.fuel:
                 succ_dropped_so_far = set()
-                succ_dropped_so_far = succ_dropped_so_far.union(state_to_expand.dropped_so_far.copy())
+                succ_dropped_so_far = succ_dropped_so_far.union(state_to_expand.dropped_so_far)
                 if drop_point in self.drop_points:
                     succ_dropped_so_far.add(drop_point)
-                    succ_state = StrictDeliveriesState(drop_point, succ_dropped_so_far.copy(), state_to_expand.fuel - cost)
+                    succ_state = StrictDeliveriesState(drop_point, succ_dropped_so_far, state_to_expand.fuel - cost)
                     yield [succ_state, cost]
                 if drop_point in self.gas_stations:
-                    succ_state = StrictDeliveriesState(drop_point, succ_dropped_so_far.copy(),self.gas_tank_capacity)
+                    succ_state = StrictDeliveriesState(drop_point, succ_dropped_so_far, self.gas_tank_capacity)
                     yield [succ_state, cost]
-
 
     def is_goal(self, state: GraphProblemState) -> bool:
         """
         This method receives a state and returns whether this state is a goal.
         """
         assert isinstance(state, StrictDeliveriesState)
-        return state.dropped_so_far <= self.drop_points <= state.dropped_so_far
+        return state.dropped_so_far == self.drop_points
